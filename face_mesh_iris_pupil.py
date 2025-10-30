@@ -201,7 +201,7 @@ def mainfunc(IMAGE_PATH):
                 diff_formula = ((((X-ecx)*cos(ang) + (Y-ecy)*sin(ang))**2) / int(ax/2)**2) + (((-(X-ecx)*sin(ang))+((Y-ecy)*cos(ang)))**2/int(by/2)**2)
                 #pr(distance_squared)
                 mask = diff_formula <= 1
-                imgtemp[~mask] = 255
+                imgtemp[~mask] = [255,0,0]
                 
                 #找橢圓極值：寫出橢圓的x(theta), y(theta)兩個函數後，微分一階 = 0
                 # 最左
@@ -215,9 +215,10 @@ def mainfunc(IMAGE_PATH):
                 
                 imgtemp = imgtemp[ (ymin-1):(ymax+1), (xmin-1):(xmax+1), :]
                 
+                
                 outpath = Path(IMAGE_PATH).parent/'output'/f'{Path(IMAGE_PATH).stem}'
                 outpath.mkdir(parents=True, exist_ok=True)
-                cv2.imwrite(outpath/f"{nummer+1}.jpg", imgtemp)
+                cv2.imwrite(outpath/f"{nummer+1}.png", imgtemp)
                 ###END###
 
 
@@ -236,7 +237,6 @@ def mainfunc(IMAGE_PATH):
         min_detection_confidence=0.5,
     ) as fm:
         out, out2 = process_frame(img, fm)
-
     #cv2.imshow('facemesh_iris_pupil_single', out)
     #cv2.imwrite(r"D:\output_filename.png", out)
     #cv2.waitKey(0)
@@ -256,43 +256,36 @@ def mainfunc(IMAGE_PATH):
 
 picpath = Path(r"C:\Users\Tristan\Downloads\pics") #裝有原圖的資料夾
 for file in picpath.glob('*JPEG'):
-    mainfunc(file)  #input image path
+    out=mainfunc(file)  #input image path
     
 ###以下是將切下來的橢圓拿來找亮點###
 
 outpicpath = picpath/'output' #the 'output' folder generated from face_mesh_iris_pupil.py
 
-for file in outpicpath.rglob('*jpg'):
-    #print(file)
+for file in outpicpath.rglob('*png'):
+    print(f'extracting bright spot from {file}')
     if 'processed' not in str(file): 
         img = cv2.imread(file)
         img2 = np.array(img)
-        img3 = np.array(img)
-        img4 = np.array(img)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         foundspot = []
     
-        ser_bound_x = round(img.shape[0]/4)
-        ser_bound_y = round(img.shape[1]/4)
+        #ser_bound_x = round(img.shape[0]/4)
+        #ser_bound_y = round(img.shape[1]/4)
     
-        for i in range(ser_bound_x, ser_bound_x*3):
-            for j in range(ser_bound_y, ser_bound_y*3):
+        for i in range(img.shape[0]):
+            for j in range(img.shape[1]):
                 if img2[i][j][0] >190 and img2[i][j][1] >190 and img2[i][j][2] >190:
-                    img2[i][j] = [0,255,0]
-                    img3[i][j] = [0,255,0]
-                    foundspot.append((i,j))
-                else:
                     img2[i][j] = [0,0,255]
-    
+                    foundspot.append((i,j))
+        
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
-        img3 = cv2.cvtColor(img3, cv2.COLOR_BGR2RGB)
-        img4 = cv2.cvtColor(img4, cv2.COLOR_BGR2RGB)
-        images = [img, img2, img3, img4]
-        imagename = ['grayscale', 'searching range and result', 'result', 'origianl pic']
+        images = [img, img2]
+        imagename = ['origianl pic', 'result']
     
     
     
-        fig, axes = plt.subplots(2, 2, figsize=(8, 6))   # 建立 2x2 子圖
+        fig, axes = plt.subplots(1, 2, figsize=(8, 6))   # 建立 2x2 子圖
         for i, ax in enumerate(axes.flat):
             if i ==0:
                 ax.imshow(images[i], cmap = 'gray')
@@ -300,8 +293,8 @@ for file in outpicpath.rglob('*jpg'):
                 ax.imshow(images[i])
             ax.set_title(imagename[i])
             
-        fig.suptitle(f'file name:{file.stem}\n pic size: {img.shape}\n spot found: {foundspot}\n threshold: [190,190,190]', fontsize=18, fontweight='bold')
+        fig.suptitle(f'file name:{file}\n pic size: {img.shape[:2]}\n spot found: {foundspot}\n threshold: [190,190,190]', fontsize=18, fontweight='bold')
         plt.tight_layout(rect=[0, 0, 1, 0.98])  # 預留 top 1% 給 suptitle，不會壓到子圖
-        plt.savefig(f'{file.parent/file.stem}_processed.jpeg', dpi=150, bbox_inches='tight')
+        plt.savefig(f'{file.parent/file.stem}_processed.png', dpi=150, bbox_inches='tight')
         plt.close(fig)
         #plt.show()
