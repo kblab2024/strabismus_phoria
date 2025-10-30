@@ -213,7 +213,7 @@ def mainfunc(IMAGE_PATH):
                 # 最下
                 ymin = int(ecy - math.sqrt(((ax/2) * sin(ang))**2 + ((by/2) * cos(ang))**2))
                 
-                imgtemp = imgtemp[ (ymin-1):(ymax+1), (xmin-1):(xmax+1), :]
+                imgtemp = imgtemp[ ymin:(ymax+1), xmin:(xmax+1), :]
                 
                 
                 outpath = Path(IMAGE_PATH).parent/'output'/f'{Path(IMAGE_PATH).stem}'
