@@ -1,8 +1,6 @@
-face_mesh_iris_pupil.py
-
 # face_mesh_iris_pupil
 
-`face_mesh_iris_pupil`is a tool using mediapipe and pypupilext for pupil detection, built by suggestion by ChatGPT5。
+`face_mesh_iris_pupil`is a tool using mediapipe and pypupilext for pupil detection, built by suggestion from ChatGPT5。
 
 ## 目錄
 - [依賴項](#依賴項)
