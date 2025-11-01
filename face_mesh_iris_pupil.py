@@ -23,10 +23,11 @@ input_folder(picpath)
 ----...all of the pictures
 ----output
 --------name of picture 1
--------------1.jpg(right iris)
--------------1_processed.jpg(right iris processed)
--------------2.jpg(left iris)
--------------2_processed.jpg(left iris processed)
+-------------1.png(right iris)
+-------------1_processed.png(right iris processed)
+-------------2.png(left iris)
+-------------2_processed.png(left iris processed)
+-------------original_picture_with_ellipse_processed.png
 --------name of picture 2
 ..........................
 """
@@ -238,7 +239,9 @@ def mainfunc(IMAGE_PATH):
     ) as fm:
         out, out2 = process_frame(img, fm)
     #cv2.imshow('facemesh_iris_pupil_single', out)
-    #cv2.imwrite(r"D:\output_filename.png", out)
+    outpath = Path(IMAGE_PATH).parent/'output'/f'{Path(IMAGE_PATH).stem}'
+    outpath.mkdir(parents=True, exist_ok=True)
+    cv2.imwrite(outpath/'original_picture_with_ellipse_processed.png', out2)
     #cv2.waitKey(0)
     #cv2.destroyAllWindows()
 
@@ -248,15 +251,17 @@ def mainfunc(IMAGE_PATH):
 #input_folder(picpath)
 #----...all of the pictures
 #----output
-#--------name of picture 1
-#-------------1.jpg(right iris)
-#-------------2.jpg(left iris)
-#--------name of picture 2
+#-------------1.png(right iris)
+#-------------1_processed.png(right iris processed)
+#-------------2.png(left iris)
+#-------------2_processed.png(left iris processed)
+#-------------original_picture_with_ellipse_processed.png
 #..........................
 
-picpath = Path(r"C:\Users\Tristan\Downloads\pics") #裝有原圖的資料夾
-for file in picpath.glob('*JPEG'):
-    out=mainfunc(file)  #input image path
+picpath = Path(r"C:\Users\Tristan\Downloads\picswithlens") #裝有原圖的資料夾
+for file in picpath.iterdir():
+    if file.suffix.lower() in ['.jpg', '.jpeg','.JPEG', '.JPG','.png']:
+        out=mainfunc(file)  #input image path
     
 ###以下是將切下來的橢圓拿來找亮點###
 
